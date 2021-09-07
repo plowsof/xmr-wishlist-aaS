@@ -10,7 +10,7 @@ import requests
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 
-#os.chdir("/home/human/Documents/kivy/rbrunner7")
+#os.chdir("/your/scripts/dir")
 wishlist = []
 repo_name =  "plowsof.github.io"
 repo_dir = "wishlist"
