@@ -3,6 +3,10 @@
 This is for people who would like to host a wishlist on their (free) githubpages site.    
 
 It will serve a Json array with address info for you githubpage to fetch.
+```
+https://github.com/plowsof/plowsof.github.io/blob/main/wishlist/wishlist-data.json
+```
+The json array is 'live' and changes will be pushed to your page (adding/removing)
 
 In your monero-wallet-rpc config file:
 ```bash
