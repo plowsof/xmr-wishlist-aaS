@@ -1,4 +1,4 @@
-#XMR wishlist as a service
+##XMR wishlist as a service
 
 This is for people who would like to host a wishlist on their (free) githubpages site.    
 
