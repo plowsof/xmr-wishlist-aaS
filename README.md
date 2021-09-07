@@ -4,12 +4,12 @@ This is for people who would like to host a wishlist on their (free) githubpages
 
 
 In your monero-wallet-rpc config file:
-```
+```bash
 tx-notify=/usr/bin/python3 /path/to/wishlist-aas.py %s
 ```
 
 In your .html file:
-```
+```html
 <div class="container"></div>
 <script src="js/app.js"></script>
 ```
