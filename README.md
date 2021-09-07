@@ -25,8 +25,8 @@ However, if you're setting this up after the fact then you will need to export t
 then see ```helpers/make_txids.py```. Slight modification to ```wishlist-aas.py```'s __main__ function to feed the tx's 1 by 1.
 
 # Support
-I enjoyed making this (because of how out of my depth i was with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
-And if you want to show support to me my xmr address is below:
+I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
+And if you want to show support to me, my xmr address is below, much appreciated! :')
 ```
 86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG
 ```
