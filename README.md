@@ -1,6 +1,12 @@
 # Live XMR wishlist as a service
 
 It will serve / push updated to a Json array file on github for any external websites to fetch and display.
+What you need:
+```
+A github account / access token for the script (modify the variables accordingly)
+monero-wallet-rpc monitoring a view-only wallet
+```
+Example json data
 ```
 https://github.com/plowsof/plowsof.github.io/blob/main/wishlist/wishlist-data.json
 ```
