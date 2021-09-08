@@ -1,8 +1,6 @@
-# Live XMR wishlist as a service (on a 'static' github page)
+# Live XMR wishlist as a service
 
-This is for people who would like to host a wishlist on their (free) githubpages site.    
-
-It will serve a Json array with address info for you githubpage to fetch.
+It will serve / push updated to a Json array file on github for any external websites to fetch and display.
 ```
 https://github.com/plowsof/plowsof.github.io/blob/main/wishlist/wishlist-data.json
 ```
