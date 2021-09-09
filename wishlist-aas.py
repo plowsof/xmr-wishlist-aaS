@@ -171,10 +171,9 @@ def uploadtogit(infile,outfile):
 
 
 if __name__ == '__main__':
-    #mitigate flooding donations
-    time.sleep(random.randint(1, 20))
-    tx_id = sys.argv[1]
     '''
+    #***************************************
+    #Used wallet - loading transactions 1 by 1 from txids
     with open('txids', "r") as f:
         #f.write(tx_id)
         #f.write("\n")
@@ -183,5 +182,14 @@ if __name__ == '__main__':
             main(line,1)
             print(line)
             time.sleep(1)
+    #***************************************
     '''
+    #'''
+    #***************************************
+    #Unused wallet
     main(tx_id)
+    #mitigate flooding donations
+    time.sleep(random.randint(1, 20))
+    tx_id = sys.argv[1]
+    #**************************************
+    #'''
