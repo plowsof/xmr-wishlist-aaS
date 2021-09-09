@@ -1,3 +1,4 @@
+import jinja2
 import pprint
 from datetime import datetime
 import pickle
@@ -9,23 +10,32 @@ import json
 import requests
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
+from matrix_client.api import MatrixHttpApi
+import emoji
 
-#os.chdir("/your/scripts/dir")
+os.chdir("/home/dir/of/wallet")
+
 wishlist = []
 repo_name =  "plowsof.github.io"
 repo_dir = "wishlist"
-git_token = "ghp_hunter2***************"
+node_url =  'http://eeebox:18090/json_rpc'
+#node_url = 'http://localhost:18082/json_rpc'
+git_token = "-"
 json_url = "https://raw.githubusercontent.com/plowsof/plowsof.github.io/main/wishlist/wishlist-data.json"
+matrix_token = "-"
+matrix_room = "-"
 
 def getJson():
     #must get the latest json as it may have been changed
     x = requests.get(json_url)
     return json.loads(x.text)
 
-def main(tx_id):
+
+def main(tx_id,conf=0):
     #check height
+    #saved_wishlist = pickle.load(open("wishlist.p", "rb"))
     saved_wishlist = getJson()
-    tx_data = checkHeight(tx_id)
+    tx_data = checkHeight(tx_id,conf)
     if tx_data:
         tx_data["amount"] = formatAmount(tx_data["amount"])
         found = 0
@@ -39,18 +49,14 @@ def main(tx_id):
                     saved_wishlist[0][i]["contributors"] += 1
                     #total += amount
                     saved_wishlist[0][i]["total"] += float(tx_data["amount"])
-                    
                     print(f"after:{saved_wishlist[0][i]}")
                     #if total => goal its 100%
                     if float(saved_wishlist[0][i]["total"]) >= float(saved_wishlist[0][i]["goal"]):
                         #fully funded [ do something special e.g. make a tweet ...]
+                        if saved_wishlist[0][i]["percent"] != 100:
+                            #We are newly fully funded
+                            matrixMsg(saved_wishlist[0][i])
                         saved_wishlist[0][i]["percent"] = 100
-                        extra_xmr = float(saved_wishlist[0][i]["total"]) - (saved_wishlist[0][i]["goal"])
-                        if extra_xmr > 0:
-                            saved_wishlist[0][i]["total"] = saved_wishlist[0][i]["goal"]
-                            print(saved_wishlist[0][i]["total"])
-                            #add to the 'main fund'
-                            saved_wishlist[1]["total"] += float(extra_xmr)
                     else:
                         saved_wishlist[0][i]["percent"] = float(saved_wishlist[0][i]["total"]) / float(saved_wishlist[0][i]["goal"]) * 100         
                     break
@@ -58,7 +64,7 @@ def main(tx_id):
                 raise e
         if found == 0:
             extra_xmr = tx_data["amount"]
-            #donation received on an address not on the wishlist
+            #donation received on invalid wishlist
             saved_wishlist[1]["total"] += float(extra_xmr)
             saved_wishlist[1]["contributors"] += 1
 
@@ -67,20 +73,31 @@ def main(tx_id):
         modified = str(datetime.now())
         saved_wishlist[1]["modified"] = modified
         print(modified)
-        pickle.dump(saved_wishlist, open( "wishlist.p", "wb+" ) )
+        #pickle.dump(saved_wishlist, open( "wishlist.p", "wb+" ) )
+        with open('wishlist-data.json', 'w') as f:
+            json.dump(saved_wishlist, f, indent=6)
         if not os.path.isfile("batched"):
             #create "batched"
             with open("batched", "w+") as f:
                 f.write("1")
-            time.sleep(30)
+            time.sleep(3)
+            with open("wishlist-data.json", "w") as f:
+                json.dump(saved_wishlist, f, indent = 6)
             createHtml()
             #push file with git
             #delete batched
             os.remove("batched")
 
+def matrixMsg(data):
+    global matrix_token
+    global matrix_room
+    message = data["desc"] + emoji.emojize(' is 100% FUNDED @twisted_turtle :thumbs_up:')
+    matrix = MatrixHttpApi("https://matrix.org", token=matrix_token)
+    response = matrix.send_message(matrix_room, message)
+
 
 def createHtml():
-    saved_wishlist = pickle.load(open("wishlist.p", "rb"))
+    #saved_wishlist = pickle.load(open("wishlist.p", "rb"))
     #create json
     with open("wishlist-data.json", "w") as f:
         json.dump(saved_wishlist, f, indent = 6)
@@ -105,6 +122,7 @@ def checkHeight(tx_id,conf=0):
     #print(someInfo)        
     height = info["transfer"]["height"]
     #quick zero conf
+    print(f"conf = {conf}")
     if conf == 0:
         if info["transfer"]["height"] == 0:
             return info["transfer"]
