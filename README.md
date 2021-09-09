@@ -1,5 +1,6 @@
 # Live XMR wishlist as a service
 
+## About
 It will serve / push updated to a Json array file on github for any external websites to fetch and display.
 What you need:
 ```
@@ -30,9 +31,17 @@ see helpers/app.js
 
 Example of progressbar/num contributors here https://plowsof.github.io/    
 
-Ideally you would begin with a fresh wallet with no activity.    
-However, if you're setting this up after the fact then you will need to export the view wallet history
-then see ```helpers/make_txids.py```. Slight modification to ```wishlist-aas.py```'s __main__ function to feed the tx's 1 by 1.
+## Setting up with an unused wallet
+- Modify helpers/make_wishlist.py to create your json wishlist, containing the subaddresses/descriptions of each wish.
+- Upload this file to your github and set the correct URL / github token values.
+- Configure your monero-wallet-rpc's 'tx-notify' value to call wishlist-aas.py with python3
+- Make sure that the pyhton script is using the correct ip:port for your rpc-wallet
+
+## Setting up with an 'already used wallet'
+Ideally you would begin with a fresh wallet with no activity. However:  
+- Open a synched view wallet up displaying the correct balance and export the view wallet history (.csv file)
+- Then see ```helpers/make_txids.py```. Slight modification to ```wishlist-aas.py```'s __main__ function to feed the tx's 1 by 1.
+- Assuming you have used helpers/make_wishlist.py and uploaded the json and have your URLs/Tokens set, revert the changes to main().
 
 # Support
 I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
