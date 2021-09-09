@@ -55,7 +55,9 @@ def main(tx_id,conf=0):
                         #fully funded [ do something special e.g. make a tweet ...]
                         if saved_wishlist[0][i]["percent"] != 100:
                             #We are newly fully funded
-                            matrixMsg(saved_wishlist[0][i])
+                            #Some 'alert' (i recomment using Apprise library but a simple matrix example:
+                            #matrixMsg(saved_wishlist[0][i])
+                            print("fully funded alert")
                         saved_wishlist[0][i]["percent"] = 100
                     else:
                         saved_wishlist[0][i]["percent"] = float(saved_wishlist[0][i]["total"]) / float(saved_wishlist[0][i]["goal"]) * 100         
