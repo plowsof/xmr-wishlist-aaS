@@ -29,9 +29,9 @@ In your .js file:
 see helpers/app.js
 ```
 
-Example of progressbar/num contributors here: 
-https://funding.monerujo.app/
-https://moneroart.neocities.org/
+Example of progressbar/num contributors here:     
+https://funding.monerujo.app/    
+https://moneroart.neocities.org/    
 
 ## Setting up with an unused wallet
 - Modify ```helpers/make_wishlist.py``` to create your json wishlist, containing the subaddresses/descriptions of each wish.
