@@ -82,9 +82,11 @@ def main(tx_id,conf=0):
             #create "batched"
             with open("batched", "w+") as f:
                 f.write("1")
-            time.sleep(3)
+            #This batched file/timer is to ensure there is only 1 upload/30 seconds 
+            time.sleep(30)
             with open("wishlist-data.json", "w") as f:
                 json.dump(saved_wishlist, f, indent = 6)
+            #legacy func name, as we dont create html anymore..
             createHtml()
             #push file with git
             #delete batched
@@ -99,7 +101,6 @@ def matrixMsg(data):
 
 
 def createHtml():
-    #saved_wishlist = pickle.load(open("wishlist.p", "rb"))
     #create json
     with open("wishlist-data.json", "w") as f:
         json.dump(saved_wishlist, f, indent = 6)
