@@ -1,7 +1,7 @@
 # Live XMR wishlist as a service
 
 ## About
-It will serve / push updated to a Json array file on github for any external websites to fetch and display.
+It will serve / push updates to a Json array file on github for any external websites to fetch and display.
 What you need:
 ```
 A github account / access token for the script (modify the variables accordingly)
