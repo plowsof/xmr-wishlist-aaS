@@ -35,7 +35,7 @@ https://moneroart.neocities.org/
 
 ## Setting up with an unused wallet
 - Modify ```helpers/make_wishlist.py``` to create your json wishlist, containing the subaddresses/descriptions of each wish.
-- Upload this file to your github and set the correct URL / github token values.
+- Upload this file to your github and set the correct URL / github token values. (or ignore this step put it on your own server, im just poor ^^)
 - Configure your monero-wallet-rpc's 'tx-notify' value to call ```wishlist-aas.py``` with python3
 - Make sure that the pyhton script is using the correct ip:port for your rpc-wallet
 
