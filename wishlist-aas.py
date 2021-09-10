@@ -32,7 +32,6 @@ def getJson():
 
 def main(tx_id,conf=0):
     #check height
-    #saved_wishlist = pickle.load(open("wishlist.p", "rb"))
     saved_wishlist = getJson()
     tx_data = checkHeight(tx_id,conf)
     if tx_data:
@@ -54,7 +53,7 @@ def main(tx_id,conf=0):
                         #fully funded [ do something special e.g. make a tweet ...]
                         if saved_wishlist[0][i]["percent"] != 100:
                             #We are newly fully funded
-                            #Some 'alert' (i recomment using Apprise library but a simple matrix example:
+                            #Some 'alert' (i recommend using Apprise library but a simple matrix example:
                             #matrixMsg(saved_wishlist[0][i])
                             print("fully funded alert")
                         saved_wishlist[0][i]["percent"] = 100
@@ -74,7 +73,6 @@ def main(tx_id,conf=0):
         modified = str(datetime.now())
         saved_wishlist[1]["modified"] = modified
         print(modified)
-        #pickle.dump(saved_wishlist, open( "wishlist.p", "wb+" ) )
         with open('wishlist-data.json', 'w') as f:
             json.dump(saved_wishlist, f, indent=6)
         if not os.path.isfile("batched"):
