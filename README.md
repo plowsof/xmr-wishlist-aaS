@@ -50,6 +50,10 @@ Ideally you would begin with a fresh wallet with no activity. However:
 - An online json editor could be used to add/remove items easily. e.g:
 - https://jsoneditoronline.org
 
+## Updates
+- QRimages generated for each subaddress + a custom logo see ```helpers/make_wishlist.py```
+- USD amounts accepted for each wish - then converted to current XMR value + a % buffer (can be changed on the fly to readjust goals also)
+
 # Support
 I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
 And if you want to show support to me, my xmr address is below, much appreciated! :')
