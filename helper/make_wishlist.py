@@ -67,10 +67,9 @@ def put_qr_code(address):
     im.paste(logo,box=(142,142),mask=logo)
     #im.show()
     im.save(f"qrs/{title}.png")
-    #uploadtogit(f"{title}.png",f"{title}.png")
-    #return("lolok")
-
-
+    #TODO - working git file upload function
+    #uploadtogit(f"{title}.png",f"{title}.png"
+    
 def wishlist_add_new(goal,desc,address,w_type):
     global git_username
     global repo_name
