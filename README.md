@@ -22,6 +22,7 @@ In your .html file:
 ```html
 <div class="container"></div>
 <script src="js/app.js"></script>
+<link href="main.css" rel="stylesheet" type="text/css" media="all">
 ```
 
 In your .js file:
