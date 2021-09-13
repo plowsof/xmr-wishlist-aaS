@@ -29,7 +29,7 @@ In your .js file:
 see helpers/app.js
 ```
 
-Example of progressbar/num contributors here: 
+## Examples 
 https://xmr.radio/funding src @ https://github.com/plowsof/funding-xmr-radio (i had full creative control over the UI for this one, so im especially proud!)    
 https://funding.monerujo.app/    
 https://moneroart.neocities.org/    
