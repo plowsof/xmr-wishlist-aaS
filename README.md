@@ -46,6 +46,10 @@ Ideally you would begin with a fresh wallet with no activity. However:
 - Then see ```helpers/make_txids.py```. Slight modification to ```wishlist-aas.py```'s __main__ function to feed the tx's 1 by 1.
 - Assuming you have used ```helpers/make_wishlist.py``` and uploaded the json and have your URLs/Tokens set, revert the changes to main().
 
+## Modifying your list
+- An online json editor could be used to add/remove items easily. e.g:
+- https://jsoneditoronline.org
+
 # Support
 I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
 And if you want to show support to me, my xmr address is below, much appreciated! :')
