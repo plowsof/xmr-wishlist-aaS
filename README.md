@@ -42,10 +42,9 @@ https://moneroart.neocities.org/
 - Make sure that the pyhton script is using the correct ip:port for your rpc-wallet
 
 ## Setting up with an 'already used wallet'
-Ideally you would begin with a fresh wallet with no activity. However:  
-- Open a synched view wallet up displaying the correct balance and export the view wallet history (.csv file)
-- Then see ```helpers/make_txids.py```. Slight modification to ```wishlist-aas.py```'s __main__ function to feed the tx's 1 by 1.
-- Assuming you have used ```helpers/make_wishlist.py``` and uploaded the json and have your URLs/Tokens set, revert the changes to main().
+Now using rpc call ```get_transfers``` to load the wallet history (if any found) (no more wasting time creating a csv file from the GUI).
+- After creating a new wishlist, the wallet history will be imported into the json data (+= to contributors and amounts of the matching addresses)
+- see ```load_old_txs``` in ```helpers/make_wishlist.py```
 
 ## Modifying your list
 - An online json editor could be used to add/remove items easily. e.g:
