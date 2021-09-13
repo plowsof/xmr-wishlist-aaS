@@ -10,84 +10,95 @@ import requests
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 from matrix_client.api import MatrixHttpApi
-import emoji
+#import emoji
+from filelock import FileLock
 
-os.chdir("/home/dir/of/wallet")
+
+os.chdir("/home/your/scripts/dir")
 
 wishlist = []
-repo_name =  "plowsof.github.io"
-repo_dir = "wishlist"
-node_url =  'http://eeebox:18090/json_rpc'
+repo_name =  "funding-xmr-radio"
+repo_dir = "json"
+node_url =  'http://eeebox:18086/json_rpc'
 #node_url = 'http://localhost:18082/json_rpc'
-git_token = "-"
-json_url = "https://raw.githubusercontent.com/plowsof/plowsof.github.io/main/wishlist/wishlist-data.json"
+git_token = "ghp_hunter2********"
+json_url = "https://raw.githubusercontent.com/plowsof/funding-xmr-radio/main/json/wishlist-data.json"
 matrix_token = "-"
 matrix_room = "-"
 
 def getJson():
     #must get the latest json as it may have been changed
-    x = requests.get(json_url)
-    return json.loads(x.text)
+    global json_url
+    try:
+        x = requests.get(json_url)
+        return json.loads(x.text)
+    except Exception as e:
+        raise e
 
-
-def main(tx_id,conf=0):
+def main(tx_id,conf=0,multi=0):
     #check height
     saved_wishlist = getJson()
-    tx_data = checkHeight(tx_id,conf)
+    if multi == 0:
+        tx_data = checkHeight(tx_id,conf)
+        if tx_data:
+            print(tx_data["address"])
+    else:
+        tx_data = tx_id
     if tx_data:
+        #print(f"we got funds : {tx_data['address']}")
         tx_data["amount"] = formatAmount(tx_data["amount"])
         found = 0
-        main_fund = saved_wishlist[1]["total"]
-        for i in range(len(saved_wishlist[0])):
+        main_fund = saved_wishlist["metadata"]["total"]
+        for i in range(len(saved_wishlist["wishlist"])):
             try:
                 #print(saved_wishlist[i])
-                if saved_wishlist[0][i]["address"] == tx_data["address"]:
+                if saved_wishlist["wishlist"][i]["address"] == tx_data["address"]:
                     found = 1
+                    saved_wishlist["wishlist"][i]["modified_date"] = str(datetime.now())
                     #contributor += 1 
-                    saved_wishlist[0][i]["contributors"] += 1
+                    saved_wishlist["wishlist"][i]["contributors"] += 1
                     #total += amount
-                    saved_wishlist[0][i]["total"] += float(tx_data["amount"])
-                    print(f"after:{saved_wishlist[0][i]}")
+                    saved_wishlist["wishlist"][i]["total"] += float(tx_data["amount"])
+                    #print(f"after:{saved_wishlist["wishlist"][i]")
                     #if total => goal its 100%
-                    if float(saved_wishlist[0][i]["total"]) >= float(saved_wishlist[0][i]["goal"]):
+                    if float(saved_wishlist["wishlist"][i]["total"]) >= float(saved_wishlist["wishlist"][i]["goal"]):
                         #fully funded [ do something special e.g. make a tweet ...]
-                        if saved_wishlist[0][i]["percent"] != 100:
+                        if saved_wishlist["wishlist"][i]["percent"] != 100:
                             #We are newly fully funded
-                            #Some 'alert' (i recommend using Apprise library but a simple matrix example:
-                            #matrixMsg(saved_wishlist[0][i])
-                            print("fully funded alert")
-                        saved_wishlist[0][i]["percent"] = 100
+                            print("something special")
+                            #matrixMsg(saved_wishlist["wishlist"][i])
+                        saved_wishlist["wishlist"][i]["percent"] = 100
                     else:
-                        saved_wishlist[0][i]["percent"] = float(saved_wishlist[0][i]["total"]) / float(saved_wishlist[0][i]["goal"]) * 100         
+                        saved_wishlist["wishlist"][i]["percent"] = float(saved_wishlist["wishlist"][i]["total"]) / float(saved_wishlist["wishlist"][i]["goal"]) * 100         
                     break
             except Exception as e:
                 raise e
         if found == 0:
             extra_xmr = tx_data["amount"]
             #donation received on invalid wishlist
-            saved_wishlist[1]["total"] += float(extra_xmr)
-            saved_wishlist[1]["contributors"] += 1
+            saved_wishlist["metadata"]["total"] += float(extra_xmr)
+            saved_wishlist["metadata"]["contributors"] += 1
 
         #finished. unless "batched" doesn't exist
-        saved_wishlist[0] = sorted(saved_wishlist[0], key=lambda k: k['percent'],reverse=True)
+        saved_wishlist["wishlist"] = sorted(saved_wishlist["wishlist"], key=lambda k: k['percent'],reverse=True)
         modified = str(datetime.now())
-        saved_wishlist[1]["modified"] = modified
+        saved_wishlist["metadata"]["modified"] = modified
         print(modified)
-        with open('wishlist-data.json', 'w') as f:
-            json.dump(saved_wishlist, f, indent=6)
+        #pickle.dump(saved_wishlist, open( "wishlist.p", "wb+" ) )
+        dump_json(saved_wishlist)
         if not os.path.isfile("batched"):
             #create "batched"
             with open("batched", "w+") as f:
                 f.write("1")
-            #This batched file/timer is to ensure there is only 1 upload/30 seconds 
             time.sleep(30)
-            with open("wishlist-data.json", "w") as f:
-                json.dump(saved_wishlist, f, indent = 6)
-            #legacy func name, as we dont create html anymore..
-            createHtml()
-            #push file with git
-            #delete batched
+            uploadtogit("wishlist-data.json","wishlist-data.json")
             os.remove("batched")
+
+def dump_json(wishlist):
+    with FileLock("wishlist-data.json.lock"):
+        print("Lock acquired.")
+        with open('wishlist-data.json', 'w') as f:
+            json.dump(wishlist, f, indent=6)  
 
 def matrixMsg(data):
     global matrix_token
@@ -95,13 +106,6 @@ def matrixMsg(data):
     message = data["desc"] + emoji.emojize(' is 100% FUNDED @twisted_turtle :thumbs_up:')
     matrix = MatrixHttpApi("https://matrix.org", token=matrix_token)
     response = matrix.send_message(matrix_room, message)
-
-
-def createHtml():
-    #create json
-    with open("wishlist-data.json", "w") as f:
-        json.dump(saved_wishlist, f, indent = 6)
-    uploadtogit("wishlist-data.json","wishlist-data.json")
 
 def checkHeight(tx_id,conf=0):
     global pickled_data
@@ -117,18 +121,25 @@ def checkHeight(tx_id,conf=0):
         except Exception as e:
             print("Retrying connection in 5 seconds.")
             time.sleep(5)
-    theData = info["transfer"]
-    someInfo = theData["address"]
-    #print(someInfo)        
-    height = info["transfer"]["height"]
-    #quick zero conf
-    print(f"conf = {conf}")
-    if conf == 0:
-        if info["transfer"]["height"] == 0:
-            return info["transfer"]
+    #pprint.pprint(info)
+    #print(f"the transfers length is {len(info['transfers'])}")
+    #pprint.pprint(info)
+    if len(info['transfers']) == 1:
+        theData = info["transfer"]
+        someInfo = theData["address"]
+        #print(someInfo)        
+        height = info["transfer"]["height"]
+        #quick zero conf
+        #print(f"conf = {conf}")
+        if conf == 0:
+            if info["transfer"]["height"] == 0:
+                return info["transfer"]
+        else:
+            if info["transfer"]["height"] != 0:
+                return info["transfer"]
     else:
-        if info["transfer"]["height"] != 0:
-            return info["transfer"]
+        for x in info["transfers"]:
+                main(x,1,1)
 
 def formatAmount(amount):
     """decode cryptonote amount format to user friendly format.
@@ -162,7 +173,7 @@ def uploadtogit(infile,outfile):
 
     with open(infile, 'r') as file:
         content = file.read()
-    print(outfile)
+    #print(outfile)
     # Upload to github
     git_file = repo_dir + "/" + outfile
     contents = repo.get_contents(git_file)
@@ -171,9 +182,11 @@ def uploadtogit(infile,outfile):
 
 
 if __name__ == '__main__':
+    tx_id = sys.argv[1]
+    
+    #feed a specific txid 
+    #tx_id = "98d754375dffe284504c820bca35f24d0261e50989c4f30561657e5c87982a1f"
     '''
-    #***************************************
-    #Used wallet - loading transactions 1 by 1 from txids
     with open('txids', "r") as f:
         #f.write(tx_id)
         #f.write("\n")
@@ -182,14 +195,6 @@ if __name__ == '__main__':
             main(line,1)
             print(line)
             time.sleep(1)
-    #***************************************
     '''
-    #'''
-    #***************************************
-    #Unused wallet
-    main(tx_id)
-    #mitigate flooding donations
-    time.sleep(random.randint(1, 20))
-    tx_id = sys.argv[1]
-    #**************************************
-    #'''
+    main(tx_id,0,0)
+
