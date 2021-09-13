@@ -80,13 +80,10 @@ def wishlist_add_new(goal,desc,address,w_type):
     global percent_buffer
     global usd_goal_address
     global node_url
-    usd_goal_address[address] = goal
-    #usd_goal_address.append(usd_address_pair)
+    
     test = getPrice("XMR",float(percent_buffer))
-    print(f"test = {test}")
     goal = goal / getPrice("XMR",float(percent_buffer))
     
-
     #Connect and generate a new sub address for our wish
     if not address:
         print("Make a new address on the fly!")
@@ -98,7 +95,7 @@ def wishlist_add_new(goal,desc,address,w_type):
                 }
         info = rpc_connection.create_address(params)
         address = info["address"]
-
+    usd_goal_address[address] = goal
     app_this = { 
                 "goal":goal,
                 "total":0,
