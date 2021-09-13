@@ -24,10 +24,32 @@ usd_goal_address = {}
 
 def getPrice(crypto,offset):
     data = cryptocompare.get_price(str(crypto), currency='USD', full=0)
-    print(f"[{crypto}]:{data[str(crypto)]['USD']}")
+    #print(f"[{crypto}]:{data[str(crypto)]['USD']}")
     value = float(data[str(crypto)]["USD"])
-    print(f"value = {value}")
+    #print(f"value = {value}")
     return(float(value) - (float(value) * float(offset)))
+
+def formatAmount(amount):
+    """decode cryptonote amount format to user friendly format.
+    Based on C++ code:
+    https://github.com/monero-project/bitmonero/blob/master/src/cryptonote_core/cryptonote_format_utils.cpp#L751
+    """
+    CRYPTONOTE_DISPLAY_DECIMAL_POINT = 12
+    s = str(amount)
+    if len(s) < CRYPTONOTE_DISPLAY_DECIMAL_POINT + 1:
+        # add some trailing zeros, if needed, to have constant width
+        s = '0' * (CRYPTONOTE_DISPLAY_DECIMAL_POINT + 1 - len(s)) + s
+    idx = len(s) - CRYPTONOTE_DISPLAY_DECIMAL_POINT
+    s = s[0:idx] + "." + s[idx:]
+
+    #my own hack to remove trailing 0's, and to fix the 1.1e-5 etc
+    trailing = 0
+    while trailing == 0:
+        if s[-1:] == "0":
+            s = s[:-1]
+        else:
+            trailing = 1
+    return s
 
 def put_qr_code(address):
     try:
@@ -71,7 +93,6 @@ def put_qr_code(address):
     #uploadtogit(f"{title}.png",f"{title}.png")
     #return("lolok")
 
-
 def wishlist_add_new(goal,desc,address,w_type):
     global git_username
     global repo_name
@@ -80,10 +101,12 @@ def wishlist_add_new(goal,desc,address,w_type):
     global percent_buffer
     global usd_goal_address
     global node_url
-    
+    #usd_goal_address.append(usd_address_pair)
     test = getPrice("XMR",float(percent_buffer))
-    goal = goal / getPrice("XMR",float(percent_buffer))
+    #print(f"test = {test}")
+    xmrgoal = goal / getPrice("XMR",float(percent_buffer))
     
+
     #Connect and generate a new sub address for our wish
     if not address:
         print("Make a new address on the fly!")
@@ -97,7 +120,7 @@ def wishlist_add_new(goal,desc,address,w_type):
         address = info["address"]
     usd_goal_address[address] = goal
     app_this = { 
-                "goal":goal,
+                "goal":xmrgoal,
                 "total":0,
                 "contributors":0,
                 "address":address,
@@ -128,8 +151,8 @@ def getJson():
 def adjust_goals(new_buffer):
     #get Json
     current_wishlist = getJson()
-    print("Before:")
-    pprint.pprint(current_wishlist)
+    #print("Before:")
+    #pprint.pprint(current_wishlist)
     #we need the usd amount + address to do this
     with open("usd-address-pair.json") as f:
         usd_pairings = json.load(f)
@@ -179,14 +202,46 @@ def change_all_titles(title):
     now_list["metadata"]["modified"] = str(datetime.now())
     dump_json(now_list)
     #Check that the .json file is 'sane', or live life in the fast lane:
-    uploadtogit("wishlist-data.json","wishlist-data.json")
+    #uploadtogit("wishlist-data.json","wishlist-data.json")
 
+#get input from a used wallet
+def load_old_txs():
+    global wishes
+    rpc_connection = AuthServiceProxy(service_url=node_url)
+    #label could be added
+    params={
+            "account_index":0,
+            "in": True
+            }
+    old_txs = {}
+    info = rpc_connection.get_transfers(params)
+    num = 0
 
+    if info["in"]:
+        print("Wallet history detected. Importing")
+        for tx in info["in"]:
+            old_txs[num] = {tx["address"]: formatAmount(tx["amount"])}
+            num += 1
+        #pprint.pprint(old_txs)
+        for wi in range(len(wishes)):
+            for hi in range(len(old_txs)):
+                #add, amount = old_txs[i]
+                try:
+                    if old_txs[hi][wishes[wi]["address"]]:
+                        print(f"{wishes[wi]['address']} got +1 contributors and {old_txs[hi][wishes[wi]['address']]} XMR")
+                        #pprint.pprint(wishes[wi])
+                        wishes[wi]["contributors"] += 1
+                        wishes[wi]["total"] += float(old_txs[hi][wishes[wi]["address"]])
+                        wishes[wi]["percent"] = float(wishes[wi]["total"]) / float(wishes[wi]["goal"]) * 100  
+                        #pprint.pprint(wishes[wi])
+                except Exception as e:
+                   continue
+                
 
 def create_new_wishlist():
-
-    wishlist_add_new(500,"Do something for the community",None,"work")
-    wishlist_add_new(5,"buy me a coffee","existingAddress","gift")
+    global wishes
+    wishlist_add_new(500,"Do something for the community","87LxtQdft3658BogUHXekShCLzbeueL2P1H3dw3h824yMsvPXdbnYBcCphvbhiVu33HNnFGx7nU7eFEMbMpRU6eWNw5pRC5","work")
+    wishlist_add_new(5,"buy me a coffee","8Bxyj1J5KfVWLxZcrH7kjtNRTAmCSLFRZiJpxp5RtZRz9YFGyhUEwwZPucPGHaYVKsYBCCtiPRy6BMyUL5soGd9KFfnmKFn","gift")
 
     thetime = datetime.now()
     total = {
@@ -199,6 +254,10 @@ def create_new_wishlist():
         "url": ""
     }
 
+    #search wallet for 'in' history, then compare addresses to our new list.
+    #if matching address are found then contributors are +=1'd and amount+=amount.
+    load_old_txs()
+
     the_wishlist = {}
     the_wishlist["wishlist"] = wishes
     the_wishlist["metadata"] = total
@@ -207,11 +266,12 @@ def create_new_wishlist():
     with open("wishlist-data.json", "w+") as f:
         json.dump(the_wishlist,f, indent=4)
 
-
+    #Original xmr goal + address pairings
     with open("usd-address-pair.json", "w+") as f:
         json.dump(usd_goal_address,f,indent=4)
-    #dump address + usd goal pairings
+    
 
+    return 
 
 
 create_new_wishlist()
@@ -221,3 +281,4 @@ create_new_wishlist()
 #adjust_goals(0.20)
 
 #change_all_titles("XMR.radio donation")
+
