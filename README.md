@@ -54,7 +54,12 @@ Ideally you would begin with a fresh wallet with no activity. However:
 ## Updates
 - QRimages generated for each subaddress + a custom logo see ```helpers/make_wishlist.py```
 - USD amounts accepted for each wish - then converted to current XMR value + a % buffer (can be changed on the fly to readjust goals also)
-
+- Generate a sub address for your wish if none is supplied see ```helpers/make_wishlist.py```. 
+- Creating wishlist is now as simple as: (3rd arg is a wish 'type' to help display things on the front end)
+```
+create_new_wishlist(500,"Something special",None,"work")
+create_new_wishlist(5,"buy me a coffee"86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
+```
 # Support
 I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
 And if you want to show support to me, my xmr address is below, much appreciated! :')
