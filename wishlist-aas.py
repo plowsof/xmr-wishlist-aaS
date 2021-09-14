@@ -186,15 +186,5 @@ if __name__ == '__main__':
     
     #feed a specific txid 
     #tx_id = "98d754375dffe284504c820bca35f24d0261e50989c4f30561657e5c87982a1f"
-    '''
-    with open('txids', "r") as f:
-        #f.write(tx_id)
-        #f.write("\n")
-        mylist = f.read().splitlines()
-        for line in mylist:
-            main(line,1)
-            print(line)
-            time.sleep(1)
-    '''
     main(tx_id,0,0)
 
