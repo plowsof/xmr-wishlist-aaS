@@ -9,7 +9,7 @@ import json
 import requests
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
-from matrix_client.api import MatrixHttpApi
+#from matrix_client.api import MatrixHttpApi
 #import emoji
 from filelock import FileLock
 
