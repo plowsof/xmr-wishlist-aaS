@@ -240,8 +240,8 @@ def load_old_txs():
 
 def create_new_wishlist():
     global wishes
-    wishlist_add_new(500,"Do something for the community","87LxtQdft3658BogUHXekShCLzbeueL2P1H3dw3h824yMsvPXdbnYBcCphvbhiVu33HNnFGx7nU7eFEMbMpRU6eWNw5pRC5","work")
-    wishlist_add_new(5,"buy me a coffee","8Bxyj1J5KfVWLxZcrH7kjtNRTAmCSLFRZiJpxp5RtZRz9YFGyhUEwwZPucPGHaYVKsYBCCtiPRy6BMyUL5soGd9KFfnmKFn","gift")
+    wishlist_add_new(500,"Do something for the community",None,"work")
+    wishlist_add_new(5,"buy me a coffee","86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
 
     thetime = datetime.now()
     total = {
