@@ -9,18 +9,23 @@ import requests
 import os
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
+#Api key of "-" appears to work currently, this may change,
+cryptocompare.cryptocompare._set_api_key_parameter("-")
+
 
 git_username = "plowsof"
-
-node_url =  'http://eeebox:18086/json_rpc'
 repo_name =  "funding-xmr-radio"
 repo_dir = "json"
+qrcode_dir = "qr_codes"
 git_token = "hunter123secret"
-cryptocompare.cryptocompare._set_api_key_parameter("-")
-wishes =[]
+node_url =  'http://eeebox:18086/json_rpc'
+json_url = f"https://raw.githubusercontent.com/{git_username}/{repo_name}/main/{repo_dir}/wishlist-data.json"
+viewkey = ""
+main_address = ""
 percent_buffer = 0.05
-json_url = "https://raw.githubusercontent.com/plowsof/funding-xmr-radio/main/json/wishlist-data.json"
+
 usd_goal_address = {}
+wishes =[]
 
 def getPrice(crypto,offset):
     data = cryptocompare.get_price(str(crypto), currency='USD', full=0)
@@ -68,25 +73,18 @@ def put_qr_code(address):
     )
 
     data = f"monero:{address}"
-
     qr.add_data(data)
-
     qr.make(fit=True)
-
     #img = qr.make_image(fill_color="black", back_color=(62,62,62))
     img = qr.make_image(fill_color=(62,62,62), back_color="white")
     img.save(f"qrs/{title}.png")
     f_logo = os.path.join(".","qrs","logo3.png")
     logo = Image.open(f_logo)
     logo = logo.convert("RGBA")
-
     print(logo.size)
     im = Image.open(f"qrs/{title}.png")
     im = im.convert("RGBA")
     logo.thumbnail((60, 60))
-
-    #im.paste(logo, (142, 142))
-    #Image.alpha_composite(im, logo).show() #.save("test3.png")
     im.paste(logo,box=(142,142),mask=logo)
     #im.show()
     im.save(f"qrs/{title}.png")
@@ -94,9 +92,7 @@ def put_qr_code(address):
     #return("lolok")
 
 def wishlist_add_new(goal,desc,address,w_type):
-    global git_username
-    global repo_name
-    global repo_dir
+    global git_username, repo_name, repo_dir, qrcode_dir
     global wishes
     global percent_buffer
     global usd_goal_address
@@ -132,7 +128,7 @@ def wishlist_add_new(goal,desc,address,w_type):
                 "author_name": "",
                 "author_email": "",
                 "id": address[0:12],
-                "qr_img_url": f"https://raw.githubusercontent.com/{git_username}/{repo_name}/main/{repo_dir}/{address[0:12]}.png",
+                "qr_img_url": f"https://raw.githubusercontent.com/{git_username}/{repo_name}/main/{qrcode_dir}/{address[0:12]}.png",
                 "title": ""
     } 
     wishes.append(app_this)
@@ -240,9 +236,14 @@ def load_old_txs():
 
 def create_new_wishlist():
     global wishes
+    global viewkey, main_address
+
+    #Your wishlist
+    #-------------------------------------------------------------
     wishlist_add_new(500,"Do something for the community",None,"work")
     wishlist_add_new(5,"buy me a coffee","86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
-
+    #-------------------------------------------------------------
+    
     thetime = datetime.now()
     total = {
         "total": 0,
@@ -251,7 +252,9 @@ def create_new_wishlist():
         "title": "",
         "description": "",
         "image": "",
-        "url": ""
+        "url": "",
+        "viewkey": viewkey,
+        "main_address": main_address
     }
 
     #search wallet for 'in' history, then compare addresses to our new list.
@@ -272,12 +275,40 @@ def create_new_wishlist():
     
 
     return 
+'''
+//-----------------------------
+// What / Why
+//-----------------------------
 
+calling create_new_wishlist will do several things:
+    - convert the usd value to xmr with a buffer (percent_buffer)
+    - create a new address for the wish if 'None' is supplied
+    - generate QRimages, and adds a qr_img_url to the json - which expects you to place them in your 'qrimage_dir' @ github
+    - creates 2 file:
+        - wishlist-data.json file to uploaded to github (manually)
+        - usd-address-pair.json which is just a list of your addresses + original usd goal which is later used by adjust_goals()
+    - load_old_txs() will get / import old tx's that have a matching address to those in your wishlist (++contributors/amounts) 
+
+You can manually adjust the json after the fact by hand or using an online json editor (easier)
+
+Why github?'
+- it's free, and you can also host a website on github pages.
+- Did i mention its free? 
+- Extra accountability as its a public ledger - edits to the json data/qr images are logged
+- See Monerujo's adaptation if you want to self host everything.
+
+//-----------------------------
+// How
+//-----------------------------
+
+go to create_new_wishlist() and add each of your wishes using a USD goal amount.
+Supply None as the address if you want to make a new one (has to be connected to an rpc wallet)
+
+'''
 
 create_new_wishlist()
 
 #Recalculate goals based on current USD value (with a buffer also) amd upload new data
-#Assumes your json data is old/modified and is being remotely stored on github
 #adjust_goals(0.20)
 
 #change_all_titles("XMR.radio donation")
