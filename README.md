@@ -60,6 +60,9 @@ create_new_wishlist(500,"Something special",None,"work")
 create_new_wishlist(5,"buy me a coffee"86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
 ```
 # Support
+
+This project has been fully funded by the Monero Outreach team @https://twitter.com/xmroutreach <3 
+
 I enjoyed making this (because of how out of my depth i am with front end stuff), i will support you if you reach out to me with issues/q's reg. this.
 And if you want to show support to me, my xmr address is below, much appreciated! :')
 ```
