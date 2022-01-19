@@ -1,7 +1,7 @@
 # Live XMR wishlist as a service
 
 ## FlipStarter
-In an experiment to explore other funding alternatives to the CCS, (and extend the outreach of Monero), i have opened up a Flipstarter to make this multi-currency. XMR/BCH/BTC. And in doing so, gain funding to improve this as a whole to make it more userfiendly / add new features. [full details here](http://167.172.143.11/)
+In an experiment to explore other funding alternatives to the CCS, (and extend the outreach of Monero), i have opened up a Flipstarter to make this multi-currency. XMR/BCH/BTC. And in doing so, gain funding to improve this as a whole to make it more userfiendly / add new features, which is being developed [here](https://github.com/plowsof/flipstarter-waas-wip)
 
 ## About
 It will serve / push updates to a Json array file on github for any external websites to fetch and display.
