@@ -7,25 +7,55 @@ import qrcode
 from PIL import Image
 import requests
 import os
+import argparse
 from github import Github
 from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 #Api key of "-" appears to work currently, this may change,
 cryptocompare.cryptocompare._set_api_key_parameter("-")
 
 
-git_username = "plowsof"
-repo_name =  "funding-xmr-radio"
+git_username = "mj-xmr"
+repo_name =  "wishlist-mj"
 repo_dir = "json"
 qrcode_dir = "qr_codes"
-git_token = "hunter123secret"
-node_url =  'http://eeebox:18086/json_rpc'
+git_token = "" # Optional
+rpc_user_default = 'monero'
+prc_pass = 'mTC78KRoTzRm21amFYXoWA==|'
+node_url_tpl =  'http://{0}:{1}@{2}:{3}/json_rpc'
 json_url = f"https://raw.githubusercontent.com/{git_username}/{repo_name}/main/{repo_dir}/wishlist-data.json"
-viewkey = ""
-main_address = ""
+viewkey = "051b61127e35e8b539c070330443f431360edcc54089ee4b5f00f3b89e84270b"
+main_address = "43yXPq28puShLkFcRgZ3kBXA2f7pmQFuweWDjt1GcKmuG5v9vRFUb81V3q8jwghxFg5bVRASKc4YedRmd3GJ9rxkBpdkGDM"
 percent_buffer = 0.05
 
 usd_goal_address = {}
 wishes =[]
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-u',  '--username',  default=rpc_user_default, type=str, help="RPC username shared via file in the working directory like: 'monero-wallet-rpc.18086.login'")
+    parser.add_argument('-ps', '--password',       default='', type=str, help="RPC password shared via file in the working directory like: 'monero-wallet-rpc.18086.login'")
+    parser.add_argument('-pf', '--password-file',  default='', type=str, help="RPC password file in the working directory like: 'monero-wallet-rpc.18086.login'")
+    parser.add_argument('-p',  '--port',           default=18086, type=int, help="RPC wallet's port'")
+    parser.add_argument('-ho', '--host',           default='localhost', type=str, help="RPC wallet's hostname'")
+
+    return parser.parse_args()
+
+def get_user_pass(args):
+    if args.password_file:
+        with open(args.password_file) as fin:
+            pair = fin.read()
+            return pair.split(':')
+    password = prc_pass
+    if args.password:
+        password = args.password
+    if args.username:
+        return args.username, password
+
+    return rpc_user_default, password
+
+def get_node_url_args(args):
+    rpc_user, rpc_pass = get_user_pass(args)
+    return node_url_tpl.format(rpc_user, rpc_pass, args.host, args.port)
 
 def getPrice(crypto,offset):
     data = cryptocompare.get_price(str(crypto), currency='USD', full=0)
@@ -91,12 +121,12 @@ def put_qr_code(address):
     #uploadtogit(f"{title}.png",f"{title}.png")
     #return("lolok")
 
-def wishlist_add_new(goal,desc,address,w_type):
+def wishlist_add_new(args, goal,desc,address,w_type):
     global git_username, repo_name, repo_dir, qrcode_dir
     global wishes
     global percent_buffer
     global usd_goal_address
-    global node_url
+    #global node_url
     #usd_goal_address.append(usd_address_pair)
     test = getPrice("XMR",float(percent_buffer))
     #print(f"test = {test}")
@@ -106,7 +136,7 @@ def wishlist_add_new(goal,desc,address,w_type):
     #Connect and generate a new sub address for our wish
     if not address:
         print("Make a new address on the fly!")
-        rpc_connection = AuthServiceProxy(service_url=node_url)
+        rpc_connection = AuthServiceProxy(service_url=get_node_url_args(args))
         #label could be added
         params={
                 "account_index":0,
@@ -201,9 +231,9 @@ def change_all_titles(title):
     #uploadtogit("wishlist-data.json","wishlist-data.json")
 
 #get input from a used wallet
-def load_old_txs():
+def load_old_txs(args):
     global wishes
-    rpc_connection = AuthServiceProxy(service_url=node_url)
+    rpc_connection = AuthServiceProxy(service_url=get_node_url_args(args))
     #label could be added
     params={
             "account_index":0,
@@ -234,14 +264,15 @@ def load_old_txs():
                    continue
                 
 
-def create_new_wishlist():
+def create_new_wishlist(args):
     global wishes
     global viewkey, main_address
 
     #Your wishlist
     #-------------------------------------------------------------
-    wishlist_add_new(500,"Do something for the community",None,"work")
-    wishlist_add_new(5,"buy me a coffee","86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
+    #wishlist_add_new(500,"Do something for the community",None,"work")
+    #wishlist_add_new(5,"buy me a coffee (mdevs)","87UF7BP47y8Zins3C7ZHDWcUSgZBchtebguCaeRQiofyFT5L9PLhZ55EMC8e4WSHaLUzGYj5w5St2jQngCeHikaa4E36Dmv","gift")
+    wishlist_add_new(args, 5,"buy me a coffee",'84N46mxVLM77YaqqMBzVe9cAN4ChBDjsXCvi9UtPVxdCeVeMfrJJM2kYv5ctp6V5taJUmRvhFWixfZ8iR2UySaRrDQgBPz7',"gift")
     #-------------------------------------------------------------
     
     thetime = datetime.now()
@@ -259,7 +290,7 @@ def create_new_wishlist():
 
     #search wallet for 'in' history, then compare addresses to our new list.
     #if matching address are found then contributors are +=1'd and amount+=amount.
-    load_old_txs()
+    load_old_txs(args)
 
     the_wishlist = {}
     the_wishlist["wishlist"] = wishes
@@ -306,7 +337,8 @@ Supply None as the address if you want to make a new one (has to be connected to
 
 '''
 
-create_new_wishlist()
+args = get_args()
+create_new_wishlist(args)
 
 #Recalculate goals based on current USD value (with a buffer also) amd upload new data
 #adjust_goals(0.20)
