@@ -14,8 +14,8 @@ from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 cryptocompare.cryptocompare._set_api_key_parameter("-")
 
 
-git_username = "mj-xmr"
-repo_name =  "wishlist-mj"
+git_username = "perfect_coder"
+repo_name =  "wishlist"
 repo_dir = "json"
 qrcode_dir = "qr_codes"
 git_token = "" # Optional
@@ -23,8 +23,8 @@ rpc_user_default = 'monero'
 prc_pass = 'mTC78KRoTzRm21amFYXoWA==|'
 node_url_tpl =  'http://{0}:{1}@{2}:{3}/json_rpc'
 json_url = f"https://raw.githubusercontent.com/{git_username}/{repo_name}/main/{repo_dir}/wishlist-data.json"
-viewkey = "051b61127e35e8b539c070330443f431360edcc54089ee4b5f00f3b89e84270b"
-main_address = "43yXPq28puShLkFcRgZ3kBXA2f7pmQFuweWDjt1GcKmuG5v9vRFUb81V3q8jwghxFg5bVRASKc4YedRmd3GJ9rxkBpdkGDM"
+viewkey = ""
+main_address = ""
 percent_buffer = 0.05
 
 usd_goal_address = {}
