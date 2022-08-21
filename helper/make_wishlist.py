@@ -14,8 +14,8 @@ from monerorpc.authproxy import AuthServiceProxy, JSONRPCException
 cryptocompare.cryptocompare._set_api_key_parameter("-")
 
 
-git_username = "perfect_coder"
-repo_name =  "wishlist"
+git_username = "plowsof"
+repo_name =  "funding-xmr-radio"
 repo_dir = "json"
 qrcode_dir = "qr_codes"
 git_token = "" # Optional
@@ -126,7 +126,6 @@ def wishlist_add_new(args, goal,desc,address,w_type):
     global wishes
     global percent_buffer
     global usd_goal_address
-    #global node_url
     #usd_goal_address.append(usd_address_pair)
     test = getPrice("XMR",float(percent_buffer))
     #print(f"test = {test}")
@@ -270,9 +269,8 @@ def create_new_wishlist(args):
 
     #Your wishlist
     #-------------------------------------------------------------
-    #wishlist_add_new(500,"Do something for the community",None,"work")
-    #wishlist_add_new(5,"buy me a coffee (mdevs)","87UF7BP47y8Zins3C7ZHDWcUSgZBchtebguCaeRQiofyFT5L9PLhZ55EMC8e4WSHaLUzGYj5w5St2jQngCeHikaa4E36Dmv","gift")
-    wishlist_add_new(args, 5,"buy me a coffee",'84N46mxVLM77YaqqMBzVe9cAN4ChBDjsXCvi9UtPVxdCeVeMfrJJM2kYv5ctp6V5taJUmRvhFWixfZ8iR2UySaRrDQgBPz7',"gift")
+    wishlist_add_new(500,"Do something for the community",None,"work")
+    wishlist_add_new(5,"buy me a coffee (mdevs)","87UF7BP47y8Zins3C7ZHDWcUSgZBchtebguCaeRQiofyFT5L9PLhZ55EMC8e4WSHaLUzGYj5w5St2jQngCeHikaa4E36Dmv","gift")
     #-------------------------------------------------------------
     
     thetime = datetime.now()
