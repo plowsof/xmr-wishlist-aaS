@@ -270,7 +270,7 @@ def create_new_wishlist(args):
     #Your wishlist
     #-------------------------------------------------------------
     wishlist_add_new(500,"Do something for the community",None,"work")
-    wishlist_add_new(5,"buy me a coffee (mdevs)","87UF7BP47y8Zins3C7ZHDWcUSgZBchtebguCaeRQiofyFT5L9PLhZ55EMC8e4WSHaLUzGYj5w5St2jQngCeHikaa4E36Dmv","gift")
+    wishlist_add_new(5,"buy me a coffee","86aSNJwDYC2AshDDvbGgtQ17RWspmKNwNXAqdFiFF2Db91v9PC26uDxffD9ZYfcMjvJpuKJepsQtELAdmXVk85E1DsuL6rG","gift")
     #-------------------------------------------------------------
     
     thetime = datetime.now()
